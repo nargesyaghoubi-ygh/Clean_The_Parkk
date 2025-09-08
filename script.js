@@ -119,4 +119,95 @@ function nextLevel() {
 }
 
 
-// -------------
+// ----------------- گرفتن موقعیت موس یا انگشت -----------------
+document.addEventListener("mousemove", e => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+});
+
+document.addEventListener("touchmove", e => {
+  if (e.touches.length > 0) {
+    mouseX = e.touches[0].clientX;
+    mouseY = e.touches[0].clientY;
+  }
+});
+
+
+// ----------------- حرکت آشغال ها -----------------
+function animateTrashes() {
+  const speed = 0.03 + level * 0.1; // سرعت بیشتر در هر مرحله
+
+  trashes.forEach(obj => {
+    if (!document.body.contains(obj.el)) return;
+
+    const rect = obj.el.getBoundingClientRect();
+    const x = rect.left + rect.width/2;
+    const y = rect.top + rect.height/2;
+
+    const dx = mouseX - x;
+    const dy = mouseY - y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+
+    if (dist < 120) { // فرار از موس/انگشت
+      obj.vx -= dx / dist * speed;
+      obj.vy -= dy / dist * speed;
+    }
+
+    // اصطکاک
+    obj.vx *= 0.9;
+    obj.vy *= 0.9;
+
+    let newLeft = parseFloat(obj.el.style.left) + obj.vx;
+    let newTop  = parseFloat(obj.el.style.top) + obj.vy;
+
+    newLeft = Math.max(0, Math.min(window.innerWidth - rect.width, newLeft));
+    newTop  = Math.max(0, Math.min(window.innerHeight - rect.height, newTop));
+
+    obj.el.style.left = newLeft + "px";
+    obj.el.style.top  = newTop + "px";
+  });
+
+  requestAnimationFrame(animateTrashes);
+}
+
+
+// ----------------- حالت آشوب -----------------
+function chaos() {
+  if (Math.random() < 0.003) {
+    document.querySelectorAll(".trash").forEach(t=>{
+      t.style.left = `${Math.random() * (window.innerWidth - 50)}px`;
+      t.style.top = `${Math.random() * (window.innerHeight - 150)}px`;
+    });
+
+    const paw = document.createElement("div");
+    paw.textContent = "🐾";
+    paw.style.position = "fixed";
+    paw.style.fontSize = "80px";
+    paw.style.left = `${Math.random() * (window.innerWidth - 100)}px`;
+    paw.style.top = `${Math.random() * (window.innerHeight - 100)}px`;
+    paw.style.transition = "opacity 1s ease, transform 1s ease";
+    document.body.appendChild(paw);
+
+    setTimeout(() => {
+      paw.style.opacity = "0";
+      paw.style.transform = "scale(2)";
+      setTimeout(() => paw.remove(), 1000);
+    }, 500);
+
+    message.textContent = "🐾 A cat shuffled the trash!";
+  }
+  requestAnimationFrame(chaos);
+}
+
+
+// ----------------- شروع بازی -----------------
+document.body.addEventListener("click", () => {
+  if (!started) {
+    started = true;
+    bgMusic.play();
+    message.textContent = "Drag or touch trash into the bin!";
+    createTrash(trashCount);
+    animateTrashes();
+    chaos();
+  }
+});
