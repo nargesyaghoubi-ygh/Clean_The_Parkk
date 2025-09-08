@@ -1,34 +1,22 @@
-<!doctype html>
-<html lang="fa">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Clean the Park! 🌳🗑</title>
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="icon" href="public/icon">
-</head>
+  <meta charset="UTF-8">
+  <title>Clean the Park! 🌳🗑️</title>
+  <link rel="stylesheet" href="css/style.css">
+  
+  <link rel="icon" href="public/icon.png">
+  </head>
 <body>
-  <main id="game" tabindex="0" aria-label="Clean the Park game">
-    <header class="topbar">
-      <h1>Clean the Park! 🌳🗑</h1>
-      <div class="info">
-        <div id="level">Level: 1</div>
-        <div id="recycled">Recycled: 0</div>
-      </div>
-    </header>
+  <h1>Clean the Park! 🌳🗑️</h1>
+  <div id="message">Click to start!</div>
+  <div id="level">Level: 1</div>
+  <div id="bin">🗑️</div>
 
-    <div id="message" class="message">Tap / click to start</div>
+  <!-- Sound effects -->
+  <audio id="catch-sound" src="sounds/drop.mp3"></audio>
+  <audio id="bg-music" src="sounds/bg.mp3" loop></audio>
 
-    <!-- playground where trash spawns -->
-    <section id="play-area" class="play-area"></section>
+  <script src="script.js"></script>
 
-    <!-- trash bin -->
-    <div id="bin" class="bin" aria-hidden="true">🗑️</div>
-
-    <!-- optional tiny UI for music toggle -->
-    <button id="muteBtn" class="mute-btn" aria-pressed="false">🔊</button>
-  </main>
-
-  <script src="script.js" defer></script>
 </body>
-</html>
