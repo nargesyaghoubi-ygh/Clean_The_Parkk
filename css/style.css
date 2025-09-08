@@ -1,0 +1,68 @@
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background: linear-gradient(180deg, #EEAECA, #9BBAE7);
+    font-family: Arial, sans-serif;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  h1 {
+    margin-top: 20px;
+    color: white;
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+  }
+
+  #bin {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    font-size: 60px;
+    padding: 20px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.4);
+    transition: transform 0.2s ease;
+  }
+   /* Message and level display */
+  #message, #level {
+    margin: 10px;
+    font-size: 20px;
+    color: white;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+  }
+
+  .trash {
+    position: absolute;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    user-select: none;
+    font-size: 40px;
+  }
+  /* Animation for trash when picked up */
+  .wiggle {
+    animation: wiggle 0.3s infinite alternate;
+  }
+
+  @keyframes wiggle {
+    from { transform: rotate(-10deg); }
+    to { transform: rotate(10deg); }
+  }
+/* Mobile */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 18px; 
+  }
+
+  #bin {
+    font-size: 40px;  
+    padding: 10px;
+  }
+
+  #message, #level {
+    font-size: 16px;
+  }
+}
