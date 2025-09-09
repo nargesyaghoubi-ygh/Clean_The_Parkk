@@ -12,8 +12,8 @@ let started = false;
 let totalTrash = trashCount;
 
 const trashes = [];
-let pointerX = 0, pointerY = 0;  // pointer (mouse or touch) position
-let activeDrag = null;
+let pointerX = 0, pointerY = 0;  // mouse/touch position
+let activeDrag = null;           // keep track of dragging
 
 // Create trash items
 function createTrash(num) {
@@ -29,7 +29,7 @@ function createTrash(num) {
     document.body.appendChild(trash);
     trashes.push({ el: trash, vx: 0, vy: 0 });
 
-    // Pointer events (work both on desktop & mobile)
+    // Pointer events (work on desktop & mobile)
     trash.addEventListener("pointerdown", e => {
       e.preventDefault();
       activeDrag = {
@@ -42,39 +42,39 @@ function createTrash(num) {
     });
 
     trash.addEventListener("pointermove", e => {
-      if (activeDrag && activeDrag.el === trash) {
-        const newLeft = e.clientX - activeDrag.offsetX;
-        const newTop = e.clientY - activeDrag.offsetY;
-        trash.style.left = newLeft + "px";
-        trash.style.top = newTop + "px";
-      }
+      if (!activeDrag || activeDrag.el !== trash) return;
+      const newLeft = e.clientX - activeDrag.offsetX;
+      const newTop = e.clientY - activeDrag.offsetY;
+      trash.style.left = newLeft + "px";
+      trash.style.top = newTop + "px";
     });
 
     trash.addEventListener("pointerup", e => {
-      if (activeDrag && activeDrag.el === trash) {
-        trash.releasePointerCapture(e.pointerId);
-        trash.classList.remove("wiggle");
-        activeDrag = null;
+      if (!activeDrag || activeDrag.el !== trash) return;
+      trash.releasePointerCapture(e.pointerId);
+      trash.classList.remove("wiggle");
+      activeDrag = null;
 
-        // Check if dropped on bin
-        const binRect = bin.getBoundingClientRect();
-        const tRect = trash.getBoundingClientRect();
-        if (!(tRect.right < binRect.left || tRect.left > binRect.right || tRect.bottom < binRect.top || tRect.top > binRect.bottom)) {
-          catchSound.play();
-          trash.remove();
-          recycled++;
-          bin.style.transform = "scale(1.2)";
-          setTimeout(()=> bin.style.transform="scale(1)", 200);
-          message.textContent = `Cleaned ${recycled} out of ${totalTrash} trash!`;
-          if (document.querySelectorAll(".trash").length === 0) {
-            nextLevel();
-          }
+      // Check drop on bin
+      const binRect = bin.getBoundingClientRect();
+      const tRect = trash.getBoundingClientRect();
+      if (!(tRect.right < binRect.left || tRect.left > binRect.right || tRect.bottom < binRect.top || tRect.top > binRect.bottom)) {
+        catchSound.play();
+        trash.remove();
+        recycled++;
+        bin.style.transform = "scale(1.2)";
+        setTimeout(()=> bin.style.transform="scale(1)", 200);
+        message.textContent = `Cleaned ${recycled} out of ${totalTrash} trash!`;
+
+        if (document.querySelectorAll(".trash").length === 0) {
+          nextLevel();
         }
       }
     });
   }
 }
 
+// Next level
 function nextLevel() {
   level++;
   trashCount += 2;
@@ -84,17 +84,18 @@ function nextLevel() {
   setTimeout(()=> createTrash(trashCount), 1000);
 }
 
-// Track pointer position (mouse OR touch)
+// Track pointer (mouse or touch)
 document.addEventListener("pointermove", e => {
   pointerX = e.clientX;
   pointerY = e.clientY;
 });
 
+// Animate trashes (make them escape)
 function animateTrashes() {
   const speed = 0.03 + level * 0.1;
 
   trashes.forEach(obj => {
-    if (!document.body.contains(obj.el) || activeDrag?.el === obj.el) return;
+    if (!document.body.contains(obj.el) || (activeDrag && activeDrag.el === obj.el)) return;
 
     const rect = obj.el.getBoundingClientRect();
     const x = rect.left + rect.width/2;
@@ -104,7 +105,7 @@ function animateTrashes() {
     const dy = pointerY - y;
     const dist = Math.sqrt(dx*dx + dy*dy);
 
-    if (dist < 120) { // escape if pointer is close
+    if (dist < 120) { // move away if pointer is close
       obj.vx -= dx / dist * speed;
       obj.vy -= dy / dist * speed;
     }
@@ -125,7 +126,7 @@ function animateTrashes() {
   requestAnimationFrame(animateTrashes);
 }
 
-// Cat chaos
+// Chaos
 function chaos() {
   if (Math.random() < 0.003) {
     document.querySelectorAll(".trash").forEach(t=>{
